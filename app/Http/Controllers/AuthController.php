@@ -102,7 +102,7 @@ class AuthController extends Controller
                 "name" => auth('api')->user()->name,
                 "surname"=>auth('api')->user()->surname,
                 "email" => auth('api')->user()->email,
-                "avatar"=>auth('api')->user()->avatar ? env("APP_URL")."storage/"  .auth('api')->user()->avatar : null,
+                "avatar"=>auth('api')->user()->avatar ? env("APP_URL")."storage/" .auth('api')->user()->avatar : null,
                 "roles" => auth('api')->user()->roles,
                 ]
 

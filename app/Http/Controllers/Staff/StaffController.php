@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\File;
 use App\Http\Resources\User\UserCollection;
 use App\Http\Resources\User\UserResource;
 
@@ -22,7 +23,13 @@ class StaffController extends Controller
         $users=User::where("name","ilike","%".$search."%")->orderBy("id","desc")->get();
 
         return response()->json([
-            "users"=> UserCollection::make($users)
+            "users"=> UserCollection::make($users),
+            "roles"=>Role::where("name","not ilike","%Veterinarios%")->get()->map(function($role){
+                return[
+                    "id"=>$role->id,
+                    "name"=>$role->name,
+                ];
+            })
         ]);
     }
 
@@ -31,6 +38,7 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
+
 
         $is_user_exists=User::where("email",$request->email)->first();
         if($is_user_exists){
@@ -41,7 +49,7 @@ class StaffController extends Controller
         }
 
         if($request->hasFile("imagen")){
-            $path=Storage::putfile("users",$request->file("imagen"));
+            $path=Storage::putFile("users",$request->file("imagen"));
             $request->request->add(["avatar"=>$path]);
         }
 
@@ -99,7 +107,7 @@ class StaffController extends Controller
             //removeRole es una funcion de Spatie
             $user->removeRole($role_od);
             $role_new = Role::findOrFail($request->role_id);
-            $user->assignRole($role);
+            $user->assignRole($role_new);
         }
 
          return response()->json([
